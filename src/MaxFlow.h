@@ -11,15 +11,14 @@ class MaxFlow : public Graph
 
 protected:
 
-    std::vector<Adjacence**>    m_adjacenceIndex;
-
     Vertex                      m_source;
     Vertex                      m_sink;
     Weight                      m_totalFlow;
 
 protected:
 
-    ;
+    cv::Point coordOfIndex(int idx) const { return cv::Point(idx % m_image.cols, floor(idx / m_image.cols)); }
+    int indexOfCoord(const cv::Point& coord) const { return coord.y * m_image.cols + coord.x; }
 
 public:
 
@@ -28,6 +27,8 @@ public:
     Vertex source() const { return m_source; }
     Vertex sink() const { return m_sink; }
     void setTerminals(Vertex source, Vertex sink) { m_source = source, m_sink = sink; }
+
+    bool isTerminal(Vertex v) const { return v != m_source && v != m_sink; }
 
     bool breathFirstSearchPath(std::vector<Edge>& path) const;
 

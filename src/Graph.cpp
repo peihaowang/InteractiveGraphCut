@@ -20,15 +20,21 @@ Graph::~Graph()
     m_vertices = nullptr;
 }
 
-Graph::Adjacence* Graph::adjacenceOf(Vertex u, Vertex v) const
+Graph::Adjacence*& Graph::adjacenceOf(Vertex u, Vertex v) const
 {
-    Adjacence* adjacence = m_vertices[u].m_next;
+    Adjacence*& adjacence = m_vertices[u].m_next;
     while(adjacence){
         if(adjacence->m_vertex == v) break;
         adjacence = adjacence->m_next;
     }
     return adjacence;
 }
+
+// Graph::Adjacence* Graph::adjacenceOf(Vertex u, Vertex v) const
+// {
+//     Adjacence*& adjacence = adjacenceOf(u, v);
+//     return (*adjacence);
+// }
 
 Graph::Adjacence* Graph::addEdge(Vertex u, Vertex v, Weight w)
 {

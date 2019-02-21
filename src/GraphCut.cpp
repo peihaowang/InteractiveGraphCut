@@ -9,13 +9,30 @@
 #include "GraphCut.h"
 
 AbstractGraphCut::AbstractGraphCut(cv::InputArray image, const std::vector<cv::Point>& foreSeeds, const std::vector<cv::Point>& backSeeds)
-    : m_foreSeeds(foreSeeds)
+    : MaxFlow(image.cols() * image.rows() + 2)
+    , m_foreSeeds(foreSeeds)
     , m_backSeeds(backSeeds)
 {
     m_image = makeContinuous(image.getMat());
 
     int countOfPixels = image.cols() * image.rows();
-    m_flowNetwork = new MaxFlow(countOfPixels + 2, countOfPixels, countOfPixels + 1);
+    MaxFlow::setTerminals(countOfPixels, countOfPixels + 1);
+
+    m_adjacenceIndex.resize(m_numOfVertices);
+    for(int i = 0; i < m_numOfVertices; i++){
+        Adjacence**& adjacences = m_adjacenceIndex[i];
+        int countOfAdjacences = -1;
+        if(i == MaxFlow::source() || i == MaxFlow::sink()){
+            // Here we define, the index of adjacence equals to the corresponding index of pixel
+            countOfAdjacences = countOfPixels;
+        }else{
+            countOfAdjacences = 4 + 2;   // Four neighbors and two edges connecting to terminals
+            // Here we define, 0 ~ 3 correspond to left, top, right, bottom respectively
+            // 4, 5 correspond to source and sink respectively
+        }
+        adjacence = new Adjacence*[countOfAdjacences];
+        for(int i = 0; i < countOfAdjacences; i++) adjacence[i] = nullptr;
+    }
 }
 
 AbstractGraphCut::~AbstractGraphCut()
@@ -32,6 +49,39 @@ cv::Mat AbstractGraphCut::makeContinuous(const cv::Mat& m)
     return m;
 }
 
+AbstractGraphCut::Adjacence*& AbstractGraphCut::adjacenceOf(Vertex u, Vertex v) const
+{
+    Adjacence*& ret = nullptr;
+    if(Vertex(0) <= u && u < Vertex(numOfVertices())){
+        Adjacence** adjacences = m_adjacenceIndex[u];
+        if(MaxFlow::isTerminal(u)){
+            if(!MaxFlow::isTerminal(v)) ret = adjacences[v];
+        }else{
+            Vertex neighbors[] = { u - 1, u - m_image.cols, u + 1, u + m_image.cols, source(), sink() };
+            for(int i = 0; i < sizeof(neighbors)/sizeof(Vertex); i++){
+                if(v == neighbor[i]){
+                    ret = adjacences[i];
+                    break;
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+AbstractGraphCut::Adjacence* AbstractGraphCut::addEdge(Vertex u, Vertex v, Weight w)
+{
+    Adjacence* adjacence = MaxFlow::addEdge(u, v, w);
+    adjacenceOf(u, v) = adjacence;
+}
+
+bool AbstractGraphCut::removeEdge(Vertex u, Vertex v)
+{
+    if(MaxFlow::removeEdge(u, v)){
+        adjacenceOf(u, v) = nullptr;
+    }
+}
+
 float AbstractGraphCut::createNEdges()
 {
     float maxPenalty = 0.0f;
@@ -44,7 +94,7 @@ float AbstractGraphCut::createNEdges()
             ){
                 float B = smoothPenalty(i, neighbor[j]);
                 // std::cout << "smooth:" << B << std::endl;
-                m_flowNetwork->addEdge(i, neighbor[j], B);
+                MaxFlow::setEdge(i, neighbor[j], B);
                 if(maxPenalty < B) maxPenalty = B;
             }
         }
@@ -54,7 +104,7 @@ float AbstractGraphCut::createNEdges()
 
 void AbstractGraphCut::createTEdges(float K)
 {
-    MaxFlow::Vertex source = m_flowNetwork->source(), sink = m_flowNetwork->sink();
+    MaxFlow::Vertex source = MaxFlow::source(), sink = MaxFlow::sink();
 
     // Initiate indexing set
     std::set<MaxFlow::Vertex> foreSet, backSet;
@@ -64,16 +114,16 @@ void AbstractGraphCut::createTEdges(float K)
     // Uniformly setup N-links
     for(int i = 0; i < m_image.cols * m_image.rows; i++){
         if(foreSet.find(i) != foreSet.end()){
-            m_flowNetwork->addEdge(source, i, K);
-            m_flowNetwork->addEdge(i, sink, 0.0f);
+            MaxFlow::setEdge(source, i, K);
+            MaxFlow::setEdge(i, sink, 0.0f);
         }else if(backSet.find(i) != backSet.end()){
-            m_flowNetwork->addEdge(source, i, 0.0f);
-            m_flowNetwork->addEdge(i, sink, K);
+            MaxFlow::setEdge(source, i, 0.0f);
+            MaxFlow::setEdge(i, sink, K);
         }else{
             float Rp[] = { backgroundPenalty(i), foregroundPenalty(i) };
             // std::cout << "Rp:" << Rp[0] << " " << Rp[1] << std::endl;
-            m_flowNetwork->addEdge(source, i, Rp[0]);
-            m_flowNetwork->addEdge(i, sink, Rp[1]);
+            MaxFlow::setEdge(source, i, Rp[0]);
+            MaxFlow::setEdge(i, sink, Rp[1]);
         }
     }
 }
@@ -83,7 +133,7 @@ void AbstractGraphCut::generateMask(cv::OutputArray result)
     // Execute Ford-Fulkerson algorithm
     cv::Mat mask = cv::Mat::zeros(m_image.rows, m_image.cols, CV_8UC1);
     std::set<MaxFlow::Vertex> foreground, background;
-    m_flowNetwork->minCut(foreground, background);
+    MaxFlow::minCut(foreground, background);
     for(MaxFlow::Vertex v : foreground){
         cv::Point coord = coordOfIndex(v);
         (*mask.ptr<unsigned char>(coord.y, coord.x)) = 255;

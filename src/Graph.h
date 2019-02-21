@@ -58,7 +58,7 @@ protected:
         return abs(f) < 10e-6;
     }
 
-    virtual Adjacence* adjacenceOf(Vertex u, Vertex v) const;
+    virtual Adjacence*& adjacenceOf(Vertex u, Vertex v) const;
     virtual Adjacence* addEdge(Vertex u, Vertex v, Weight w);
     virtual bool removeEdge(Vertex u, Vertex v);
 
@@ -76,7 +76,6 @@ public:
     int numberOfVertices() const { return m_numOfVertices; }
     int numberOfEdges() const { return m_numOfEdges; }
 
-    void addEdge(Vertex u, Vertex v, Weight w);
     void setEdge(Vertex u, Vertex v, Weight w);
     Edge edgeOf(Vertex u, Vertex v) const;
 

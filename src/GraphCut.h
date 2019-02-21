@@ -2,20 +2,28 @@
 #ifndef _GRAPH_CUT_H_
 #define _GRAPH_CUT_H_
 
-class MaxFlow;
-template<typename T, int Dim> class Histogram;
-typedef Histogram<unsigned char, 3> Histogram3c;
+#include "MaxFlow.h"
+#include "Histogram.h"
 
-class AbstractGraphCut
+class AbstractGraphCut : private MaxFlow
 {
 
 protected:
 
-    cv::Mat                 m_image;
-    std::vector<cv::Point>  m_foreSeeds;
-    std::vector<cv::Point>  m_backSeeds;
+    cv::Mat                     m_image;
+    std::vector<cv::Point>      m_foreSeeds;
+    std::vector<cv::Point>      m_backSeeds;
 
-    MaxFlow*                m_flowNetwork;
+    std::vector<Adjacence**>    m_adjacenceIndex;
+
+protected:
+
+    using Graph::addEdge;
+    using Graph::removeEdge;
+
+    virtual Adjacence*& adjacenceOf(Vertex u, Vertex v) const override;
+    virtual Adjacence* addEdge(Vertex u, Vertex v, Weight w) override;
+    virtual bool removeEdge(Vertex u, Vertex v) override;
 
 protected:
 
@@ -53,11 +61,11 @@ class GraphCut : private AbstractGraphCut
 
 protected:
 
-    float                   m_Sigma;
-    float                   m_Lambda;
+    float                       m_Sigma;
+    float                       m_Lambda;
 
-    Histogram3c*            m_foreDistribution;
-    Histogram3c*            m_backDistribution;
+    Histogram3c*                m_foreDistribution;
+    Histogram3c*                m_backDistribution;
 
 protected:
 

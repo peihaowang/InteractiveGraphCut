@@ -140,4 +140,8 @@ typedef Histogram<double, 1>        Histogram1f;
 typedef Histogram<double, 2>        Histogram2f;
 typedef Histogram<double, 3>        Histogram3f;
 
+typedef Histogram<unsigned char, 1> Histogram1c;
+typedef Histogram<unsigned char, 2> Histogram2c;
+typedef Histogram<unsigned char, 3> Histogram3c;
+
 #endif // _HISTOGRAM_H_
