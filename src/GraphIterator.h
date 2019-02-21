@@ -14,10 +14,11 @@ protected:
     const Graph*                    m_graph;
 
     typedef Graph::Vertex Vertex;
+    typedef Graph::Adjacence Adjacence;
 
-    Vertex                          m_current;
-    std::queue<Vertex>              m_queue;
-    std::map<Vertex, Vertex>        m_parents;
+    std::vector<Adjacence*>::size_t m_current;
+    std::vector<Adjacence*>         m_queue;
+    std::map<Vertex, Adjacence*>    m_parents;
 
 protected:
 

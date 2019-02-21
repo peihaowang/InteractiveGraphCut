@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-project(GraphCut)
+project(InteractiveGraphCut)
 
 # Enable C++11 for new language features
 set(CMAKE_CXX_STANDARD 11)
