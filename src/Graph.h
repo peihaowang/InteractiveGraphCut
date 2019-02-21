@@ -27,10 +27,11 @@ protected:
     {
         Vertex              m_vertex;
         Weight              m_weight;
+        // Adjacence*          m_prev;
         Adjacence*          m_next;
 
         Adjacence(Vertex vertex = Vertex(-1), Weight weight = Weight(0.0f))
-            :m_vertex(vertex)
+            : m_vertex(vertex)
             , m_weight(weight)
             , m_next(nullptr)
         {
@@ -67,7 +68,7 @@ public:
     Graph(int numOfVertices);
     virtual ~Graph();
 
-    int numberOfVertex() const { return m_numOfVertices; }
+    int numberOfVertices() const { return m_numOfVertices; }
     int numberOfEdges() const { return m_numOfEdges; }
 
     void addEdge(Vertex u, Vertex v, Weight w);

@@ -18,16 +18,13 @@ bool MaxFlow::breathFirstSearchPath(std::vector<Edge>& path) const
 
     GraphBFSIterator it(this, m_source);
     // Breath first search for the sink node
-    do{
-        if(it.vertex() == m_sink) break;
-    }while(it.next());
+    do{ if(it.vertex() == m_sink) break; }while(it.next());
 
     if(!it.atEnd()){
-        Vertex v = it.vertex();
-        while(v != Vertex(-1)){
-            Vertex u = it.parent(v);
-            if(u != Vertex(-1)) path.push_back(edgeOf(u, v));
-            v = u;
+        while(it.vertex() != Vertex(-1)){
+            GraphBFSIterator::Connection conn = it.connection();
+            if(conn.isValid()) path.push_back(Edge(conn.from(), conn.to(), conn.weight()));
+            it.promote();
         }
         std::reverse(path.begin(), path.end());
     }

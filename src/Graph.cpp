@@ -24,7 +24,9 @@ void Graph::addEdge(Vertex u, Vertex v, Weight w)
 {
     if(!isZero(w)){
         Adjacence* newConn = new Adjacence(v, w);
+        // if(m_vertices[u].m_next) m_vertices[u].m_next->m_prev = newConn;
         newConn->m_next = m_vertices[u].m_next;
+        // newConn->m_prev = &m_vertices[u];
         m_vertices[u].m_next = newConn;
         m_numOfEdges++;
     }
@@ -47,8 +49,9 @@ void Graph::setEdge(Vertex u, Vertex v, Weight w)
             adjacence->m_weight = w;
         }else{
             // std::cout << "Remove Edge " << u << " " << v << std::endl;
+            // if(adjacence->m_next) adjacence->m_next->m_prev = prev;
             prev->m_next = adjacence->m_next;
-            adjacence->m_next = nullptr;
+            adjacence->m_next = nullptr; //adjacence->m_prev = nullptr;
             delete adjacence; adjacence = nullptr;
             m_numOfEdges--;
         }

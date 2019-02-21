@@ -10,10 +10,6 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
-# Create code from a list of Qt designer ui files
-set(CMAKE_AUTOUIC ON)
 
 # Path to 3rdparty library
 set(3RDPARTY_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/lib")

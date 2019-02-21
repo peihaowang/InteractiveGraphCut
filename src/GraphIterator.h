@@ -11,14 +11,34 @@ class GraphBFSIterator
 
 protected:
 
-    const Graph*                    m_graph;
-
     typedef Graph::Vertex Vertex;
+    typedef Graph::Edge Edge;
+    typedef Graph::Weight Weight;
     typedef Graph::Adjacence Adjacence;
 
-    std::vector<Adjacence*>::size_t m_current;
+public:
+
+    struct Connection{
+    private:
+        Vertex                      m_from;
+        Adjacence*                  m_adjacence;
+        friend class GraphBFSIterator;
+    public:
+        Connection() : m_from(-1), m_adjacence(nullptr) { return; }
+        bool isValid() const { return m_from >= Vertex(0) && m_adjacence != nullptr; }
+        Vertex from() const { return m_from; }
+        Vertex to() const { return m_adjacence->m_vertex; }
+        Weight weight() const { return m_adjacence->m_weight; }
+        Connection& operator=(const Connection& rhs) { m_from = rhs.m_from; m_adjacence = rhs.m_adjacence; return (*this); }
+    };
+
+protected:
+
+    const Graph*                    m_graph;
+
+    int                             m_current;
     std::vector<Adjacence*>         m_queue;
-    std::map<Vertex, Adjacence*>    m_parents;
+    std::map<Vertex, int>           m_parents;
 
 protected:
 
@@ -28,14 +48,17 @@ public:
 
     GraphBFSIterator(const Graph* graph, Vertex start);
 
-    bool atBegin() const { return parent() == Vertex(-1) && !atEnd(); }
-    bool atEnd() const { return m_current == Vertex(-1); }
+    bool atBegin() const { return m_current == 0; }
+    bool atEnd() const { return m_current == m_queue.size(); }
 
-    Vertex vertex() const { return m_current; }
-    Vertex parent() const { return parent(m_current); }
-    Vertex parent(Vertex v) const;
+    Vertex vertex() const;
+    Vertex parent() const;
 
     bool next();
+    bool back();
+    bool promote();
+
+    Connection connection() const;
 
 };
 
