@@ -11,9 +11,15 @@ class MaxFlow : public Graph
 
 protected:
 
-    Vertex      m_source;
-    Vertex      m_sink;
-    Weight      m_totalFlow;
+    std::vector<Adjacence**>    m_adjacenceIndex;
+
+    Vertex                      m_source;
+    Vertex                      m_sink;
+    Weight                      m_totalFlow;
+
+protected:
+
+    ;
 
 public:
 
