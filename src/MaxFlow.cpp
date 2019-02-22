@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <time.h>
+#include "StopWatch.h"
 #include "MaxFlow.h"
 
 MaxFlow::MaxFlow(int numOfVertices, Vertex source, Vertex sink)
@@ -18,15 +20,20 @@ bool MaxFlow::breathFirstSearchPath(std::vector<Edge>& path) const
 
     GraphBFSIterator it(this, m_source);
     // Breath first search for the sink node
-    do{ if(it.vertex() == m_sink) break; }while(it.next());
+    do{ if(it.peek(m_sink)) break; }while(it.next());
 
     if(!it.atEnd()){
         Vertex v = it.vertex();
+
+        // Add the edge between pixel and sink
+        path.push_back(edgeOf(v, m_sink));
+
         while(v != Vertex(-1)){
             it.promote(); Vertex u = it.vertex();
             if(u != Vertex(-1)) path.push_back(edgeOf(u, v));
             v = u;
         }
+
         std::reverse(path.begin(), path.end());
     }
     return !path.empty();
@@ -35,19 +42,16 @@ bool MaxFlow::breathFirstSearchPath(std::vector<Edge>& path) const
 MaxFlow::Weight MaxFlow::maxFlow()
 {
     std::vector<Edge> path;
+    double tBFS = 0.0, tFindMin = 0.0, tSetEdge = 0.0;
+    StopWatch sw;
     int n = 0;
+    sw.tick();
     while(breathFirstSearchPath(path)){
+        tBFS += sw.escapeTime(); sw.tick();
         // Select the minimum capacity along the path as the flow
         Weight flow = Weight(std::numeric_limits<float>::infinity());
         for(Edge e : path){ if(flow > e.m_weight) flow = e.m_weight; }
-
-        if(n % 100 == 0) {
-            std::cout << path[0].m_from << " -";
-            for(Edge e : path){
-                std::cout << e.m_weight << "-> " << e.m_to << " -";
-            }
-            std::cout << std::endl;
-        }
+        tFindMin += sw.escapeTime(); sw.tick();
 
         // Add up flow
         m_totalFlow += flow;
@@ -56,9 +60,21 @@ MaxFlow::Weight MaxFlow::maxFlow()
         for(Edge e : path){
             setEdge(e.m_from, e.m_to, e.m_weight - flow);
             setEdge(e.m_to, e.m_from, e.m_weight + flow);
+            tFindMin += sw.escapeTime(); sw.tick();
         }
+        tSetEdge += sw.escapeTime(); sw.tick();
 
-        if(n % 100 == 0) std::cout << flow << " " << m_numOfEdges << " " << m_totalFlow << std::endl;
+        if(n % 1000 == 0) {
+            std::cout << "Path:" << path[0].m_from << " - ";
+            for(Edge e : path){
+                std::cout << e.m_weight << " -> " << e.m_to << " - ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "Flow:" << flow << " #OfEdges:" << m_numOfEdges << " TotalFlow:" << m_totalFlow << std::endl;
+            std::cout << "BFS:" << tBFS << " FindMin:" << tFindMin << " SetEdge:" << tSetEdge << std::endl;
+            tBFS = tFindMin = tSetEdge = 0.0;
+        }
         n++;
     }
     return m_totalFlow;

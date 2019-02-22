@@ -152,17 +152,18 @@ void AbstractGraphCut::cutImage(cv::InputArray image, cv::OutputArray result)
 
     // Construct edges
     float maxPenalty = createNEdges();
-    sw.tick("Create N-Link Edges");
+    sw.tickPrint("Create N-Link Edges");
 
     createTEdges(maxPenalty + 1.0f);
-    sw.tick("Create T-Link Edges");
+    sw.tickPrint("Create T-Link Edges");
 
     // Generate mask
     cv::Mat mask; generateMask(mask);
-    sw.tick("Ford-Fulkerson");
+    cv::imwrite("../mask.jpg", mask);
+    sw.tickPrint("Ford-Fulkerson");
 
     image.getMat().copyTo(result, mask);
-    sw.tick("Cut Image");
+    sw.tickPrint("Cut Image");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

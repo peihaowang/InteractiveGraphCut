@@ -18,19 +18,19 @@ protected:
 
 public:
 
-    struct Connection{
-    private:
-        Vertex                      m_from;
-        Adjacence*                  m_adjacence;
-        friend class GraphBFSIterator;
-    public:
-        Connection() : m_from(-1), m_adjacence(nullptr) { return; }
-        bool isValid() const { return m_from >= Vertex(0) && m_adjacence != nullptr; }
-        Vertex from() const { return m_from; }
-        Vertex to() const { return m_adjacence->m_vertex; }
-        Weight weight() const { return m_adjacence->m_weight; }
-        Connection& operator=(const Connection& rhs) { m_from = rhs.m_from; m_adjacence = rhs.m_adjacence; return (*this); }
-    };
+    // struct Connection{
+    // private:
+    //     Vertex                      m_from;
+    //     Adjacence*                  m_adjacence;
+    //     friend class GraphBFSIterator;
+    // public:
+    //     Connection() : m_from(-1), m_adjacence(nullptr) { return; }
+    //     bool isValid() const { return m_from >= Vertex(0) && m_adjacence != nullptr; }
+    //     Vertex from() const { return m_from; }
+    //     Vertex to() const { return m_adjacence->m_vertex; }
+    //     Weight weight() const { return m_adjacence->m_weight; }
+    //     Connection& operator=(const Connection& rhs) { m_from = rhs.m_from; m_adjacence = rhs.m_adjacence; return (*this); }
+    // };
 
 protected:
 
@@ -38,11 +38,12 @@ protected:
 
     int                             m_current;
     std::vector<Adjacence*>         m_queue;
-    std::map<Vertex, int>           m_parents;
+    enum Parent{ None = -1, Invalid = -2 };
+    std::vector<int>                m_parents;
 
 protected:
 
-    inline bool isVisited(Vertex v) const { return m_parents.find(v) != m_parents.end(); }
+    inline bool isVisited(Vertex v) const { return m_parents[v] != Parent::Invalid; }
 
 public:
 
@@ -53,12 +54,13 @@ public:
 
     Vertex vertex() const;
     Vertex parent() const;
+    bool peek(Vertex v) { return isVisited(v); }
 
     bool next();
     bool back();
     bool promote();
 
-    Connection connection() const;
+    // Connection connection() const;
 
 };
 
