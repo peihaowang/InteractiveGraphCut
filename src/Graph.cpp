@@ -20,9 +20,9 @@ Graph::~Graph()
     m_vertices = nullptr;
 }
 
-Graph::Adjacence*& Graph::adjacenceOf(Vertex u, Vertex v) const
+Graph::Adjacence* Graph::adjacenceOf(Vertex u, Vertex v) const
 {
-    Adjacence*& adjacence = m_vertices[u].m_next;
+    Adjacence* adjacence = m_vertices[u].m_next;
     while(adjacence){
         if(adjacence->m_vertex == v) break;
         adjacence = adjacence->m_next;

@@ -21,10 +21,11 @@ bool MaxFlow::breathFirstSearchPath(std::vector<Edge>& path) const
     do{ if(it.vertex() == m_sink) break; }while(it.next());
 
     if(!it.atEnd()){
-        while(it.vertex() != Vertex(-1)){
-            GraphBFSIterator::Connection conn = it.connection();
-            if(conn.isValid()) path.push_back(Edge(conn.from(), conn.to(), conn.weight()));
-            it.promote();
+        Vertex v = it.vertex();
+        while(v != Vertex(-1)){
+            it.promote(); Vertex u = it.vertex();
+            if(u != Vertex(-1)) path.push_back(edgeOf(u, v));
+            v = u;
         }
         std::reverse(path.begin(), path.end());
     }

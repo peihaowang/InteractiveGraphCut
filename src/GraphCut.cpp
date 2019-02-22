@@ -18,27 +18,29 @@ AbstractGraphCut::AbstractGraphCut(cv::InputArray image, const std::vector<cv::P
     int countOfPixels = image.cols() * image.rows();
     MaxFlow::setTerminals(countOfPixels, countOfPixels + 1);
 
-    m_adjacenceIndex.resize(m_numOfVertices);
-    for(int i = 0; i < m_numOfVertices; i++){
-        Adjacence**& adjacences = m_adjacenceIndex[i];
+    m_adjacenceIndex.resize(numberOfVertices());
+    for(int u = 0; u < numberOfVertices(); u++){
+        Adjacence**& adjacences = m_adjacenceIndex[u];
         int countOfAdjacences = -1;
-        if(i == MaxFlow::source() || i == MaxFlow::sink()){
+        if(MaxFlow::isTerminal(u)){
             // Here we define, the index of adjacence equals to the corresponding index of pixel
             countOfAdjacences = countOfPixels;
         }else{
-            countOfAdjacences = 4 + 2;   // Four neighbors and two edges connecting to terminals
             // Here we define, 0 ~ 3 correspond to left, top, right, bottom respectively
             // 4, 5 correspond to source and sink respectively
+            countOfAdjacences = 4 + 2;   // Four neighbors and two edges connecting to terminals
         }
-        adjacence = new Adjacence*[countOfAdjacences];
-        for(int i = 0; i < countOfAdjacences; i++) adjacence[i] = nullptr;
+        adjacences = new Adjacence*[countOfAdjacences];
+        for(int i = 0; i < countOfAdjacences; i++) adjacences[i] = nullptr;
     }
 }
 
 AbstractGraphCut::~AbstractGraphCut()
 {
-    delete m_flowNetwork;
-    m_flowNetwork = nullptr;
+    for(int i = 0; i < numberOfVertices(); i++){
+        Adjacence** adjacences = m_adjacenceIndex[i];
+        delete[] adjacences; adjacences = nullptr;
+    }
 }
 
 cv::Mat AbstractGraphCut::makeContinuous(const cv::Mat& m)
@@ -49,37 +51,40 @@ cv::Mat AbstractGraphCut::makeContinuous(const cv::Mat& m)
     return m;
 }
 
-AbstractGraphCut::Adjacence*& AbstractGraphCut::adjacenceOf(Vertex u, Vertex v) const
+AbstractGraphCut::Adjacence** AbstractGraphCut::adjacencePointer(Vertex u, Vertex v) const
 {
-    Adjacence*& ret = nullptr;
-    if(Vertex(0) <= u && u < Vertex(numOfVertices())){
+    Adjacence** result = nullptr;
+    if(Vertex(0) <= u && u < Vertex(numberOfVertices())){
         Adjacence** adjacences = m_adjacenceIndex[u];
         if(MaxFlow::isTerminal(u)){
-            if(!MaxFlow::isTerminal(v)) ret = adjacences[v];
+            if(!MaxFlow::isTerminal(v)){
+                result = &adjacences[v];
+            }
         }else{
             Vertex neighbors[] = { u - 1, u - m_image.cols, u + 1, u + m_image.cols, source(), sink() };
             for(int i = 0; i < sizeof(neighbors)/sizeof(Vertex); i++){
-                if(v == neighbor[i]){
-                    ret = adjacences[i];
+                if(v == neighbors[i]){
+                    result = &adjacences[i];
                     break;
                 }
             }
         }
     }
-    return ret;
+    return result;
 }
 
 AbstractGraphCut::Adjacence* AbstractGraphCut::addEdge(Vertex u, Vertex v, Weight w)
 {
     Adjacence* adjacence = MaxFlow::addEdge(u, v, w);
-    adjacenceOf(u, v) = adjacence;
+    updateAdjacenceIndex(u, v, adjacence);
+    return adjacence;
 }
 
 bool AbstractGraphCut::removeEdge(Vertex u, Vertex v)
 {
-    if(MaxFlow::removeEdge(u, v)){
-        adjacenceOf(u, v) = nullptr;
-    }
+    bool succ = MaxFlow::removeEdge(u, v);
+    if(succ) updateAdjacenceIndex(u, v, nullptr);
+    return succ;
 }
 
 float AbstractGraphCut::createNEdges()
@@ -111,7 +116,7 @@ void AbstractGraphCut::createTEdges(float K)
     for(cv::Point coord : m_foreSeeds) foreSet.insert(indexOfCoord(coord));
     for(cv::Point coord : m_backSeeds) backSet.insert(indexOfCoord(coord));
 
-    // Uniformly setup N-links
+    // Setup T-links
     for(int i = 0; i < m_image.cols * m_image.rows; i++){
         if(foreSet.find(i) != foreSet.end()){
             MaxFlow::setEdge(source, i, K);

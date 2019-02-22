@@ -21,7 +21,25 @@ protected:
     using Graph::addEdge;
     using Graph::removeEdge;
 
-    virtual Adjacence*& adjacenceOf(Vertex u, Vertex v) const override;
+    Adjacence** adjacencePointer(Vertex u, Vertex v) const;
+
+    bool updateAdjacenceIndex(Vertex u, Vertex v, Adjacence* adjacence)
+    {
+        bool succ = false;
+        Adjacence** p = adjacencePointer(u, v);
+        if(p){
+            (*p) = adjacence;
+            succ = true;
+        }
+        return succ;
+    }
+
+    virtual Adjacence* adjacenceOf(Vertex u, Vertex v) const override
+    {
+        Adjacence** p = adjacencePointer(u, v);
+        return p ? (*p) : nullptr;
+    }
+
     virtual Adjacence* addEdge(Vertex u, Vertex v, Weight w) override;
     virtual bool removeEdge(Vertex u, Vertex v) override;
 

@@ -58,7 +58,7 @@ protected:
         return abs(f) < 10e-6;
     }
 
-    virtual Adjacence*& adjacenceOf(Vertex u, Vertex v) const;
+    virtual Adjacence* adjacenceOf(Vertex u, Vertex v) const;
     virtual Adjacence* addEdge(Vertex u, Vertex v, Weight w);
     virtual bool removeEdge(Vertex u, Vertex v);
 
