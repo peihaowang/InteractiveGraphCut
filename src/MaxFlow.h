@@ -15,17 +15,24 @@ protected:
     Vertex                      m_sink;
     Weight                      m_totalFlow;
 
+    int *                       m_levels;
+
+
+protected:
+
+    bool breathFirstSearch();
+    bool depthFirstSearch(Vertex u, std::vector<Edge>& path);
+
 public:
 
     MaxFlow(int numOfVertices, Vertex source = Vertex(-1), Vertex sink = Vertex(-1));
+    virtual ~MaxFlow();
 
     Vertex source() const { return m_source; }
     Vertex sink() const { return m_sink; }
     void setTerminals(Vertex source, Vertex sink) { m_source = source, m_sink = sink; }
 
     bool isTerminal(Vertex v) const { return v == m_source || v == m_sink; }
-
-    bool breathFirstSearchPath(std::vector<Edge>& path) const;
 
     Weight maxFlow();
     void minCut(std::set<Vertex>& s, std::set<Vertex>& t);

@@ -5,8 +5,8 @@
 
 int main(int argc, char* argv[])
 {
-    cv::Mat imgSeed = cv::imread("../seed.jpg");
-    cv::Mat imgSrc = cv::imread("../src.jpg");
+    cv::Mat imgSeed = cv::imread("../ironman_mask.jpg");
+    cv::Mat imgSrc = cv::imread("../ironman.jpg");
     auto mask2Vec = [](const cv::Mat& img, std::vector<cv::Point>& fore, std::vector<cv::Point>& back){
         for(int y = 0; y < img.rows; y++){
             for(int x = 0; x < img.cols; x++){
@@ -27,6 +27,6 @@ int main(int argc, char* argv[])
 
     cv::Mat result;
     GraphCut::cutImage(imgSrc, result, fore, back, 0.5);
-    cv::imwrite("../result.jpg", result);
+    cv::imwrite("../ironman_result.jpg", result);
     return 0;
 }
