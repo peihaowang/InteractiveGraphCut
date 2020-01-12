@@ -79,29 +79,13 @@ if(NOT OpenCV_FOUND)
 	message(FATAL_ERROR "Failed to find OpenCV.")
 endif()
 
-# Qt5
-# find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets OpenGL)
-# get_target_property(QtCore_LIBRARIES Qt5::Core LOCATION)
-# get_target_property(QtGui_LIBRARIES Qt5::Gui LOCATION)
-# get_target_property(QtWidgets_LIBRARIES Qt5::Widgets LOCATION)
-
 set(3RDPARTY_INCLUDE_DIRS
 	${EIGEN3_INCLUDE_DIRS}
 	${GLM_INCLUDE_DIRS}
 	${OpenCV_INCLUDE_DIRS}
-
-	# Qt libraries
-	# ${Qt5Core_INCLUDE_DIRS}
-	# ${Qt5Gui_INCLUDE_DIRS}
-	# ${Qt5Widgets_INCLUDE_DIRS}
 )
 
 set(3RDPARTY_LIBRARIES
-	# Qt libraries
-	# Qt5::Core
-	# Qt5::Gui
-	# Qt5::Widgets
-
 	${OpenCV_LIBRARIES}
 )
 
