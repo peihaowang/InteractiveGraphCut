@@ -78,11 +78,9 @@ void Graph::setEdge(Vertex u, Vertex v, Weight w)
         if(!isZero(w)){
             adjacence->m_weight = w;
         }else{
-            // std::cout << "Remove Edge " << u << " " << v << std::endl;
             removeEdge(u, v);
         }
     }else{
-        // std::cout << "Add Edge " << u << " " << v << " " << w << std::endl;
         addEdge(u, v, w);
     }
 }

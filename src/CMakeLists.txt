@@ -1,7 +1,6 @@
 
 set(SOURCE_FILE_PATH
 	Graph.cpp
-	GraphIterator.cpp
 	MaxFlow.cpp
 	GraphCut.cpp
 )

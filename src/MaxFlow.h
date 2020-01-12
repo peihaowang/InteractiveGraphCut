@@ -3,8 +3,8 @@
 #define _MAX_FLOW_H_
 
 #include <set>
+#include <vector>
 #include "Graph.h"
-#include "GraphIterator.h"
 
 class MaxFlow : public Graph
 {
@@ -15,8 +15,7 @@ protected:
     Vertex                      m_sink;
     Weight                      m_totalFlow;
 
-    int *                       m_levels;
-
+    std::vector<int>            m_levels;
 
 protected:
 
@@ -26,7 +25,6 @@ protected:
 public:
 
     MaxFlow(int numOfVertices, Vertex source = Vertex(-1), Vertex sink = Vertex(-1));
-    virtual ~MaxFlow();
 
     Vertex source() const { return m_source; }
     Vertex sink() const { return m_sink; }

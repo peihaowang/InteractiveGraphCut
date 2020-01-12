@@ -1,4 +1,3 @@
-
 #ifndef _GRAPH_CUT_H_
 #define _GRAPH_CUT_H_
 
