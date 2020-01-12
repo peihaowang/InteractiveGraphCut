@@ -2,6 +2,7 @@
 set(SOURCE_FILE_PATH
 	Graph.cpp
 	MaxFlow.cpp
+	GraphCutImpl.cpp
 	GraphCut.cpp
 )
 

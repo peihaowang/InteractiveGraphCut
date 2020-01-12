@@ -41,29 +41,6 @@ function(FILE_EXISTS FOUND FILES)
 	endforeach()
 endfunction()
 
-# Eigen3
-find_package(EIGEN3 QUIET)
-if(NOT EIGEN3_FOUND)
-	set(EIGEN3_INCLUDE_DIRS "${3RDPARTY_LIBRARY_DIR}/eigen3")
-endif()
-FILE_EXISTS(EIGEN3_FOUND ${EIGEN3_INCLUDE_DIRS})
-if(NOT EIGEN3_FOUND)
-	message(FATAL_ERROR "Failed to find Eigen3.")
-endif()
-
-# GLM
-find_package(GLM QUIET)
-if(NOT GLM_FOUND)
-	set(GLM_INCLUDE_DIRS "${3RDPARTY_LIBRARY_DIR}/glm/include")
-endif()
-FILE_EXISTS(GLM_FOUND ${GLM_INCLUDE_DIRS})
-if(NOT GLM_FOUND)
-	message(FATAL_ERROR "Failed to find GLM.")
-endif()
-# Enable experimental modules provided by GLM
-# Otherwise, compiler might report errors
-add_definitions("-DGLM_ENABLE_EXPERIMENTAL")
-
 # OpenCV
 find_package(OpenCV QUIET)
 if(NOT OpenCV_FOUND)
@@ -80,8 +57,6 @@ if(NOT OpenCV_FOUND)
 endif()
 
 set(3RDPARTY_INCLUDE_DIRS
-	${EIGEN3_INCLUDE_DIRS}
-	${GLM_INCLUDE_DIRS}
 	${OpenCV_INCLUDE_DIRS}
 )
 

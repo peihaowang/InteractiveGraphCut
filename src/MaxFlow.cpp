@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include <queue>
 #include "MaxFlow.h"
 
@@ -33,6 +34,7 @@ bool MaxFlow::breathFirstSearch()
             adjacence = adjacence->m_next;
         }
     }
+
     return m_levels[m_sink] != -1;
 }
 

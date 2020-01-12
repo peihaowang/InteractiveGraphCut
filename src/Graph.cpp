@@ -30,12 +30,6 @@ Graph::Adjacence* Graph::adjacenceOf(Vertex u, Vertex v) const
     return adjacence;
 }
 
-// Graph::Adjacence* Graph::adjacenceOf(Vertex u, Vertex v) const
-// {
-//     Adjacence*& adjacence = adjacenceOf(u, v);
-//     return (*adjacence);
-// }
-
 Graph::Adjacence* Graph::addEdge(Vertex u, Vertex v, Weight w)
 {
     Adjacence* newConn = adjacenceOf(u, v);

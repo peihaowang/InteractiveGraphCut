@@ -15,8 +15,8 @@ void mask2Vec(const cv::Mat& img, std::vector<cv::Point>& fore, std::vector<cv::
 
 int main(int argc, char* argv[])
 {
-    if(argc < 4){
-        std::cout << "Usage: " << argv[0] << " <input image> <input mask> <output path>" << std::endl;
+    if(argc < 5){
+        std::cout << "Usage: " << argv[0] << " <input image> <input seed> <output path> <mask path>" << std::endl;
         return -1;
     }
 
@@ -26,9 +26,15 @@ int main(int argc, char* argv[])
     std::vector<cv::Point> fore, back;
     mask2Vec(imgSeed, fore, back);
 
-    cv::Mat result;
-    GraphCut::cutImage(imgSrc, result, fore, back, 0.5);
+    cv::Mat result, mask;
+    GraphCut::PerfMetric perf;
+    GraphCut::cutImage(imgSrc, result, mask, fore, back, 0.5, -1.0, &perf);
     cv::imwrite(argv[3], result);
+    cv::imwrite(argv[4], mask);
+
+    std::cout << "Create N-Links: " << perf.m_tNLink << "s" << std::endl;
+    std::cout << "Create T-Links: " << perf.m_tTLink << "s" << std::endl;
+    std::cout << "Max Flow: " << perf.m_tMaxFlow << "s" << std::endl;
 
     return 0;
 }
