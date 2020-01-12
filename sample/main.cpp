@@ -16,7 +16,7 @@ void mask2Vec(const cv::Mat& img, std::vector<cv::Point>& fore, std::vector<cv::
 int main(int argc, char* argv[])
 {
     if(argc < 5){
-        std::cout << "Usage: " << argv[0] << " <input image> <input seed> <output path> <mask path>" << std::endl;
+        std::cout << "Usage: GraphCutter <input image> <input seed> <output path> <mask path>" << std::endl;
         return -1;
     }
 

@@ -43,37 +43,32 @@ Here are some troubleshoots you may need to pay attention:
 
 ### Library
 
-*PoissonImageEditing* is released under `LGPL` license. Both shared and static libraries are available for end users. After building and installing *PoissonImageEditing*, you could include the header `PoissonImage.h` and link binary files in your own project. The basic usages of provided APIs are presented as follows:
+Both shared and static libraries of *InteractiveGraphCut* are available for end users. After building and installing *InteractiveGraphCut*, you use it simply by including the header `GraphCut.h` and link binary files into your own project. The basic usages of provided APIs are presented as follows:
 
 ```
-bool ::seamlessClone(cv::InputArray src, cv::InputArray dst, cv::InputArray mask
-        , const cv::Point& offset, cv::OutputArray output
-        , GradientScheme gradientSchm = GradientScheme::Maximum
-        , DiffOp gradientOp = DiffOp::Backward
-        , DiffOp divOp = DiffOp::Forward
-        , PerfMetric* perfMetric = nullptr
+static void cutImage(cv::InputArray image, cv::OutputArray result, cv::OutputArray mask
+    , const std::vector<cv::Point>& foreSeeds, const std::vector<cv::Point>& backSeeds
+    , float lambda = 0.01f, float sigma = -1.0, PerfMetric* perfMetric = nullptr
 );
 ```
 
-1. It requires source and destination images as inputs and a target image on which output the final result.
+1. The API requires one input image and two output image, where `result` will be the image of foreground object and `mask` will contain a binary bitmap.
 
-2. Mask is provided to tell the algorithm rough boundaries of the objects in source image(Hence, their sizes should be the same).
+2. Both `foreSeeds` and `backSeeds` are the user-specified prior labels mentioned before. They are both a subset of pixel coordinates. And they must not share an intersection.
 
-3. The source image is initially put on the center of the destination image, but offset means that it is possible to move the source objects on the destination canvas by giving a translation.
+3. Two hyperparameters `lambda` and `sigma` are provided to tune *InteractiveGraphCut*. `lambda` is known as the coefficient of the region properties term. `sigma` is the variance applied in smooth penalty, usually computed from the input image by default. Leaving both parameters below 0 indicates the default value.
 
-4. The following three parameters tweak several steps in the algorithm slightly, where `Gradient Scheme` specifies the blending policy to the gradient fields of source and destination images, whose differences as shown below. The other two parameters specifies which discrete differential operator will be taken for gradient field and `div` operator respectively.
+4. The retriever of performance metric `perfMetric` is an optional parameter, given to measure running time in each computational step. Leave `nullptr` to ignore it.
 
-| Naive | Replace | Average | Maximum |
-|:--------------:|:--------------:|:----------------:|:----------------:|
-| ![Naive](/showcases/case3/naive.jpg?raw=true) | ![Replace](/showcases/case3/replace.jpg?raw=true) | ![Average](/showcases/case3/average.jpg?raw=true) | ![Maximum](/showcases/case3/maximum.jpg?raw=true) |
+### Executable
 
-5. The retriever of performance metric is an optional parameter, which measures the running time of each stage in the algorithm. Leave the pointer null to ignore the performance metric.
-
-## Executable
-
-The sample code can be compiled into a command-line utility, which has basic features to seamlessly combine two images together. To run the executable appropriately, read the following usages please:
+The sample code can be compiled into a command-line utility, which has basic features to do image segmentation. Before you feed the target image into *InteractiveGraphCut*, you may need to create a 3-channel prior seed image with the identical size to your input, where red pixel labels foreground, greed pixel labels background and black for the remaining pixels. To run the executable appropriately, read the following usages please:
 
 ```
-Usage: PoissonImageEditor <source-path> <destination-path> <output-path>
-        [ <mask-path> [ <x-offset> <y-offset> [ <-r|-a|-m> [ <-b|-f|-c> <-b|-f|-c> ] ] ] ]
+Usage: GraphCutter <input image> <input seed> <output path> <mask path>
 ```
+
+## References
+
+1. [Boykov, Yuri Y., and M-P. Jolly. "Interactive graph cuts for optimal boundary & region segmentation of objects in ND images." Proceedings eighth IEEE international conference on computer vision. ICCV 2001. Vol. 1. IEEE, 2001.](https://cs.uwaterloo.ca/~yboykov/Abstracts/iccv01-abs.html)
+2. [Boykov, Yuri, and Vladimir Kolmogorov. "An experimental comparison of min-cut/max-flow algorithms for energy minimization in vision." IEEE Transactions on Pattern Analysis & Machine Intelligence 9 (2004): 1124-1137.](https://cs.uwaterloo.ca/~yboykov/Abstracts/pami04-abs.shtml)
